@@ -590,147 +590,34 @@ src="https://raw.githubusercontent.com/mtrenkina/mtrenkina.github.io/master/img/
 src="https://raw.githubusercontent.com/mtrenkina/mtrenkina.github.io/master/img/diagrposl.png">
 </center>
 
-
-  <div class="col-12 col-lg-8"><span class="font-black">Требования</span><br>
-	<ul type="none" style="padding-left: 30px; text-align: left">
-		<li>1. SPA должно представлять собой игру. </li>
-		<li>2. Смысл игры заключается в том, чтобы преодолевать препятствия и зарабатывать очки. </li>
-    		<li>3. В игре должна происходить постоянная смена препятствий. </li>
-    		<li>4. В игре должна находится кнопка для управления. </li>
-    		<li>5. Должна быть иконка набора очков для понимания своего успеха в игре. </li>
-    	
-	</ul>
-</div>
-</div>
-
 <br>
-<body onload="startGame()">
 
+<h3>Приложение SPA</h3>		
+		<div align="left">
+			<table><tr><td><span class="textl">
+			Требования:</br>
+				1. SPA должна решать математическую задачу</br>
+				2. Смысл задачи заключается в решении квадратного уравнения различной сложности.</br>
+				3. Уравнение должно иметь общий вид.</br>
+				4. Коэффициенты могут иметь как знак плюс, так и минус.</br>
+				5. При неверных начальных данных, SPA должна выдавать исключение.</br>
+				6. Интерфейс должен быть привычным и максимально простым.</br>
+			</span></td>
+			<td>
+			<form id="f" onSubmit="calc(); return false;" method="post">
+			<span class="textl">
+				Уравнение <input type="text" name="a" onChange="calc();" onKeyUp="calc();" size="4" value="0"/>x<sup>2</sup> +<input type="text" name="b" onChange="calc();" onKeyUp="calc();" size="4" value="0"/>x +<input type="text" name="c" onChange="calc();" onKeyUp="calc();" size="4" value="0"/>= 0
+				
+				</br>
+				Дискриминант D =<input type="text" name="d" readonly="readonly" size="6"/>
+				</br>
+				Корни x<sub>1</sub> =<input type="text" name="x1" readonly="readonly" size="6"/> x<sub>2</sub> = <input type="text" name="x2" readonly="readonly" size="6"/>
+			</span>
+			</form>
+			</td></tr></table>
+		</div>
 
-<script>
-var myGamePiece;
-var myObstacles = [];
-var myScore;
-function startGame() {
-    myGamePiece = new component(30, 30, "red", 10, 120);
-    myGamePiece.gravity = 0.35;
-    myScore = new component("30px", "Consolas", "black", 280, 40, "text");
-    myGameArea.start();
-
-}
-var myGameArea = {
-    canvas : document.createElement("canvas"),
-    start : function() {
-        this.canvas.width = 480;
-        this.canvas.height = 270;
-        this.context = this.canvas.getContext("2d");
-        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-        this.frameNo = 0;
-        this.interval = setInterval(updateGameArea, 20);
-
-        },
-    clear : function() {
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    }
-}
-function component(width, height, color, x, y, type) {
-    this.type = type;
-    this.score = 0;
-    this.width = width;
-    this.height = height;
-    this.speedX = 0;
-    this.speedY = 0;    
-    this.x = x;
-    this.y = y;
-    this.gravity = 0;
-    this.gravitySpeed = 0;
-    this.update = function() {
-        ctx = myGameArea.context;
-        if (this.type == "text") {
-            ctx.font = this.width + " " + this.height;
-            ctx.fillStyle = color;
-            ctx.fillText(this.text, this.x, this.y);
-        } else {
-            ctx.fillStyle = color;
-            ctx.fillRect(this.x, this.y, this.width, this.height);
-        }
-    }
-    this.newPos = function() {
-        this.gravitySpeed += this.gravity;
-        this.x += this.speedX;
-        this.y += this.speedY + this.gravitySpeed;
-        this.hitBottom();
-    }
-    this.hitBottom = function() {
-        var rockbottom = myGameArea.canvas.height - this.height;
-        if (this.y > rockbottom) {
-            this.y = rockbottom;
-            this.gravitySpeed = 0;
-        }
-    }
-    this.crashWith = function(otherobj) {
-        var myleft = this.x;
-        var myright = this.x + (this.width);
-        var mytop = this.y;
-        var mybottom = this.y + (this.height);
-        var otherleft = otherobj.x;
-        var otherright = otherobj.x + (otherobj.width);
-        var othertop = otherobj.y;
-        var otherbottom = otherobj.y + (otherobj.height);
-        var crash = true;
-        if ((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright)) {
-            crash = false;
-        }
-        return crash;
-    }
-}
-function updateGameArea() {
-    var x, height, gap, minHeight, maxHeight, minGap, maxGap;
-    for (i = 0; i < myObstacles.length; i += 1) {
-        if (myGamePiece.crashWith(myObstacles[i])) {
-            return;
-        } 
-    }
-    myGameArea.clear();
-    myGameArea.frameNo += 1;
-    if (myGameArea.frameNo == 1 || everyinterval(150)) {
-        x = myGameArea.canvas.width;
-        minHeight = 20;
-        maxHeight = 200;
-        height = Math.floor(Math.random()*(maxHeight-minHeight+1)+minHeight);
-        minGap = 50;
-        maxGap = 200;
-        gap = Math.floor(Math.random()*(maxGap-minGap+1)+minGap);
-        myObstacles.push(new component(10, height, "green", x, 0));
-        myObstacles.push(new component(10, x - height - gap, "green", x, height + gap));
-    }
-    for (i = 0; i < myObstacles.length; i += 1) {
-        myObstacles[i].x += -1;
-        myObstacles[i].update();
-    }
-    myScore.text="SCORE: " + myGameArea.frameNo;
-    myScore.update();
-    myGamePiece.newPos();
-    myGamePiece.update();
-}
-function everyinterval(n) {
-    if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
-    return false;
-}
-function accelerate(n) {
-    myGamePiece.gravity = n;
-}
-</script>
-<div class="col-xs-12" style="height:260px;"></div>
-        </div>
-<button onmousedown="accelerate(-0.2)"
-        onmouseup="accelerate(0.05)"
-        style="vertical-align: middle"
->ПРЫЖОК</button>
-
-</body>
-<br/>	
-	    </div>
+		
 
 </body>
 </html>
